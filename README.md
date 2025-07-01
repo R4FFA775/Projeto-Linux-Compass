@@ -18,30 +18,57 @@ Projeto de configuração de servidor web com monitoramento e alertas automatiza
 
 ### Etapa 1: Configuração do Ambiente na AWS
 
-Nesta etapa, a infraestrutura base foi criada na AWS para hospedar a aplicação. O processo seguiu as melhores práticas de segurança e organização.
+#### Guia de Criação Detalhado
 
-1.  **Criação da Rede (VPC):**
-    * [cite_start]Foi criada uma VPC para isolar os recursos do projeto. [cite: 1]
-    * [cite_start]Dentro da VPC, foram configuradas **2 sub-redes públicas** (para acesso externo, como o servidor web) e **2 sub-redes privadas** (para recursos futuros, como bases de dados). [cite: 14]
-    * [cite_start]Um **Internet Gateway** foi criado e conectado às sub-redes públicas para permitir a comunicação com a internet. [cite: 15]
-  
+O processo de criação da infraestrutura no console da AWS seguiu os seguintes passos: A chave que vc criou
+
+**1. Criação da Rede (VPC):**
+
+* No console da AWS, foi acedido o serviço **VPC**.
+* Foi selecionada a opção **"Criar VPC"** e, em seguida, o assistente **"VPC e mais"** para automatizar a criação dos componentes.
+* As configurações aplicadas foram:
+    * **Nome:** `projeto-final-vpc`
+    * **Zonas de Disponibilidade (AZs):** `2`
+    * **Número de sub-redes públicas:** `2`
+    * **Número de sub-redes privadas:** `2`
+    * **Gateways NAT:** `Nenhum`
+    * **Endpoints da VPC:** `Gateway do S3`
+* Após a confirmação, o assistente criou a VPC, as 4 sub-redes, um **Internet Gateway** e as tabelas de rotas necessárias.
+
+**2. Criação do Servidor (Instância EC2):**
+
+* No console da AWS, foi acedido o serviço **EC2**.
+* Foi selecionada a opção **"Executar instância"**.
+* As configurações aplicadas foram:
+    * **Nome:** `servidor-final-aws`
+    * **AMI (Sistema Operacional):** `Ubuntu Server LTS` 
+    * **Tipo de Instância:** `t2.micro` 
+    * **Par de Chaves (Login):** Foi criado um novo par de chaves do tipo `RSA` e formato `.pem`, que foi descarregado e guardado em segurança para permitir o acesso SSH.
+    * **Configurações de Rede:** A instância foi associada à **VPC** `projeto-final-vpc` e colocada numa das **sub-redes públicas**. A opção para atribuir um IP público automaticamente foi ativada.
+    * **Firewall (Grupo de Segurança):** Foi criado um novo Security Group com as seguintes regras de entrada:
+        * Permitir tráfego **SSH** (porta 22) para acesso administrativo.
+        * Permitir tráfego **HTTP** (porta 80) para acesso ao servidor web.
+
+* Finalmente, a instância foi executada clicando em **"Executar instância"**.
+
+#### Acesso Remoto Seguro com SSH
+
+Após a criação bem-sucedida da instância EC2, o passo seguinte foi estabelecer uma conexão remota segura para poder instalar e configurar o servidor web. Para isso, foi utilizado o protocolo **SSH (Secure Shell)**.
+
+O acesso foi realizado a partir de um terminal local (Windows PowerShell), seguindo estes passos:
+
+**1. Pré-requisitos:**
+* A instância EC2 estava no estado "Em execução" (Running).
+* O **Endereço IPv4 Público** da instância foi copiado do painel da AWS.
+* O ficheiro da chave privada (**`.pem`**), descarregado durante a criação do Par de Chaves, estava guardado num local seguro no computador local.
+
+**2. Navegação para a Pasta da Chave:**
+No terminal local, foi utilizado o comando `cd` para navegar até à pasta onde o ficheiro `.pem` estava guardado.
+```bash
+# Exemplo de navegação para a pasta Downloads
+cd Downloads
 
 
-
----
-2.  **Criação do Servidor (Instância EC2):**
-    * [cite_start]Foi lançada uma instância EC2 do tipo `t2.micro` (dentro do Nível Gratuito) utilizando uma imagem **Ubuntu Server LTS**. [cite: 16]
-    * [cite_start]A instância foi colocada numa das **sub-redes públicas** para ser acessível externamente. [cite: 17]
-    * Foi criado e associado um **Par de Chaves (`.pem`)** para garantir o acesso seguro via SSH.
-
-
-
-
-
-
-3.  **Configuração do Firewall (Security Group):**
-    * Foi criado um Security Group para controlar o tráfego de entrada.
-    * [cite_start]Foram adicionadas regras para permitir tráfego na **porta 80 (HTTP)**, para que o site seja visível, e na **porta 22 (SSH)**, para gestão remota do servidor. [cite: 17]
 
 
 
