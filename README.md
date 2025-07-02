@@ -18,9 +18,7 @@ O objetivo deste projeto foi desenvolver e testar habilidades em Linux, AWS e au
 
 ### Etapa 1: Configuração do Ambiente na AWS
 
-#### Guia de Criação Detalhado
-
-O processo de criação da infraestrutura no console da AWS seguiu os seguintes passos: A chave que vc criou
+O processo de criação da infraestrutura no console da AWS seguiu os seguintes passos:
 
 **1. Criação da Rede (VPC):**
 
@@ -93,8 +91,6 @@ Na primeira vez que se conecta a um novo servidor, o cliente SSH exibe a "impres
 *Exemplo da confirmação de autenticidade:*
 ![Coloque aqui o print do PowerShell a pedir a confirmação "yes/no"](conexao-ssh.png)
 
-```
-```
 ### Etapa 2: Configuração do Servidor Web
 
 Com o acesso SSH estabelecido, o passo seguinte foi a instalação e configuração do servidor web Nginx para exibir uma página HTML personalizada.
@@ -117,6 +113,8 @@ sudo apt install nginx -y
     # Verifica o estado atual do Nginx
     sudo systemctl status nginx
     ```
+*Verifique digitando "Endereço IPv4 público ex:3.141.34.169
+
 * Para garantir que o serviço Nginx inicie sempre que o servidor for ligado, o seguinte comando foi executado para o habilitar:
     ```bash
     # Habilita o Nginx para iniciar no boot
@@ -139,11 +137,11 @@ sudo apt install nginx -y
     </head>
     <body>
         <h1>Meu Projeto Linux - DevSecOps na AWS!</h1>
-        <p>Servidor Nginx configurado com sucesso por Razzur!</p>
+        <p>Servidor Nginx configurado com sucesso!</p>
     </body>
     </html>
     ```
-
+---
 ### Etapa 3: Script de Monitoramento e Automação
 
 Com o servidor web funcional, o foco passou a ser a criação de um sistema de monitoramento
@@ -163,7 +161,7 @@ para escrever digite: `nano monitor.sh`
     site="(http://127.0.0.1)"
     log="/var/log/monitoramento.log"
     # A URL real do webhook foi removida por segurança
-    webhook="SUA_URL_SECRETA_DO_DISCORD_AQUI"
+    webhook="SUA_URL_DO_DISCORD_AQUI"
 
     # Data e hora atual
     data=$(date "+%Y-%m-%d %H:%M:%S")
@@ -225,10 +223,7 @@ Um passo crucial para o funcionamento do script foi a correta configuração do 
     # Observa o log em tempo real
     tail -f /var/log/monitoramento.log
     ```
-
-*Exemplo do Alerta e dos Logs Gerados:*
-`[Coloque aqui os prints do alerta no Discord e do ficheiro de log]`
-
+---
 ### Etapa 4: Testes de Validação e Conclusão
 
 Para validar que a solução completa era robusta e funcional, foi executada uma série de testes no ambiente da AWS, simulando cenários de operação normal e de falha, conforme solicitado pelo projeto.
@@ -241,7 +236,7 @@ Para validar que a solução completa era robusta e funcional, foi executada uma
     2.  **Registo de Log:** O ficheiro `/var/log/monitoramento.log` foi atualizado com uma nova linha, registando a "FALHA" e o código de status correspondente.
 
 *Exemplo do Alerta Recebido no Discord:*
-`[Coloque aqui o print do alerta a chegar no seu Discord]`
+![alerta-de-falha-servidor](alerta-falha.png)
 
 #### Teste 2: Simulação de Recuperação do Serviço
 
@@ -251,14 +246,5 @@ Para validar que a solução completa era robusta e funcional, foi executada uma
     2.  **Registo de Log:** Na execução seguinte do script, o ficheiro de log foi atualizado com uma nova linha, desta vez registando "Site funcionando", confirmando que o sistema de monitoramento detetou a normalização do serviço.
 
 *Exemplo do Ficheiro de Log com funcionamento e Falha(Oflline):*
-`[Coloque aqui o print do seu ficheiro de log]`
+![ficheiro-dos-logs](registro-de-logs.png)
 
----
-
-## 🎓 Conclusão e Aprendizados
-
-Este projeto foi uma jornada prática e completa através dos pilares do DevSecOps. A construção de uma infraestrutura na nuvem com a AWS, a configuração de um servidor web Linux e, principalmente, a criação de um sistema de monitoramento com alertas e automação, permitiram solidificar conceitos fundamentais da área.
-
-Os principais desafios superados, como a resolução de problemas de rede (`Connection timed out` vs. `Connection refused`), a gestão de permissões de ficheiros no Linux e a escolha da ferramenta de automação correta, foram os pontos de maior aprendizado.
-
-O resultado final é um sistema funcional, monitorado e resiliente, que cumpre todos os requisitos propostos e utiliza práticas profissionais da indústria.
