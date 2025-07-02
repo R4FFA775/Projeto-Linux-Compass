@@ -243,6 +243,6 @@ Para validar que a solução completa era robusta e funcional, foi executada uma
     1.  **Fim dos Alertas:** Nenhuma nova notificação de falha foi enviada.
     2.  **Registo de Log:** Na execução seguinte do script, o ficheiro de log foi atualizado com uma nova linha, desta vez registando "Site funcionando", confirmando que o sistema de monitoramento detetou a normalização do serviço.
 
-*Exemplo do Ficheiro de Log com funcionamento e Falha(Oflline):*
+*Exemplo do Ficheiro de Log com funcionamento e Falha(Offline):*
 ![ficheiro-dos-logs](registro-de-logs.png)
 
