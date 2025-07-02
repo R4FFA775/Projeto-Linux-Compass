@@ -41,7 +41,7 @@ O processo de criação da infraestrutura no console da AWS seguiu os seguintes 
     * **AMI (Sistema Operacional):** `Ubuntu Server LTS`
     * **Tags**(escolha do usuario)
     * **Tipo de Instância:** `t2.micro` 
-    * **Par de Chaves (Login):** Foi criado um novo par de chaves do tipo `RSA` e formato `.pem`, que foi descarregado e guardado em segurança para permitir o acesso SSH.
+    * **Par de Chaves (Login):** Foi criado um novo par de chaves do tipo `RSA` e formato `.pem`, que foi baixado e guardado em segurança para permitir o acesso SSH.
     * **Configurações de Rede:** A instância foi associada à **VPC** `projeto-final-vpc` e colocada numa das **sub-redes públicas**. A opção para atribuir um IP público automaticamente foi ativada.
     * **Firewall (Grupo de Segurança):** Foi criado um novo Security Group com as seguintes regras de entrada:
         * Permitir tráfego **SSH** (porta 22) para qualquer lugar (0.0.0.0/0)
@@ -82,16 +82,16 @@ Os componentes deste comando são:
   * **`ubuntu`**: É o nome de utilizador padrão para as imagens oficiais do Ubuntu Server na AWS.
   * **`@SEU_IP_PUBLICO_DA_AWS`**: O endereço público do servidor na nuvem.
 
-**4. Confirmação de Autenticidade do Host:**
+**4. Confirmação de Autenticidade:**
 
-Na primeira vez que se conecta a um novo servidor, o cliente SSH exibe a "impressão digital" (fingerprint) do servidor e pede uma confirmação de confiança. Foi digitado `yes` para aprovar a conexão e adicionar o servidor à lista de hosts conhecidos. Esta é uma medida de segurança importante contra ataques "man-in-the-middle".
+Ao tentar conectar pela primeira vez, o terminal mostrou uma mensagem de segurança, exibindo uma chave de autenticidade do novo servidor. Para continuar, ele perguntou que queria conectar.Digita yes para confirmar que o servidor era confiável. Fazendo isso, o computador guardou as informações do servidor para garantir que as futuras conexões a ele sejam seguras.
 
 *Exemplo da confirmação de autenticidade:*
 ![Coloque aqui o print do PowerShell a pedir a confirmação "yes/no"](conexao-ssh.png)
 
 ### Etapa 2: Configuração do Servidor Web
 
-Com o acesso SSH estabelecido, o passo seguinte foi a instalação e configuração do servidor web Nginx para exibir uma página HTML personalizada.
+Com o acesso SSH, o passo seguinte foi a instalação e configuração do servidor web Nginx para exibir uma página HTML personalizada.
 
 **1. Instalação do Nginx:**
 O servidor foi primeiramente atualizado para garantir que todos os pacotes estivessem na sua versão mais recente, uma boa prática de segurança. Em seguida, o Nginx foi instalado utilizando o gestor de pacotes `apt`.
@@ -111,8 +111,6 @@ sudo apt install nginx -y
     # Verifica o estado atual do Nginx
     sudo systemctl status nginx
     ```
-*Verifique digitando "Endereço IPv4 público ex:3.141.34.169
-
 * Para garantir que o serviço Nginx inicie sempre que o servidor for ligado, o seguinte comando foi executado para o habilitar:
     ```bash
     # Habilita o Nginx para iniciar no boot
@@ -156,7 +154,7 @@ para escrever digite: `nano monitor.sh`
     #!/bin/bash
 
     # Configs básicas
-    site="(http://127.0.0.1)"
+    site="http://127.0.0.1"
     log="/var/log/monitoramento.log"
     # A URL real do webhook foi removida por segurança
     webhook="SUA_URL_DO_DISCORD_AQUI"
