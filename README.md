@@ -1,5 +1,5 @@
 # Projeto-Linux-Compass
-Projeto de configuração de servidor web com monitoramento e alertas automatizados
+Projeto de configuração de servidor web com monitoramento e alertas
 
 ## Objetivo do Projeto
 O objetivo deste projeto foi desenvolver e testar habilidades em Linux, AWS e automação através da configuração de um ambiente de servidor web Nginx monitorado, que envia alertas em caso de falha.
