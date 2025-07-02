@@ -40,8 +40,8 @@ O processo de criação da infraestrutura no console da AWS seguiu os seguintes 
 * No console da AWS, foi acedido o serviço **EC2**.
 * Foi selecionada a opção **"Executar instância"**.
 * As configurações aplicadas foram:
-    * **Nome:** `servidor-final-aws`
-    * **AMI (Sistema Operacional):** `Ubuntu Server LTS` 
+    * **AMI (Sistema Operacional):** `Ubuntu Server LTS`
+    * **Tags**
     * **Tipo de Instância:** `t2.micro` 
     * **Par de Chaves (Login):** Foi criado um novo par de chaves do tipo `RSA` e formato `.pem`, que foi descarregado e guardado em segurança para permitir o acesso SSH.
     * **Configurações de Rede:** A instância foi associada à **VPC** `projeto-final-vpc` e colocada numa das **sub-redes públicas**. A opção para atribuir um IP público automaticamente foi ativada.
@@ -149,9 +149,66 @@ sudo apt install nginx -y
 
 **3. Verificação Final:**
 
-* Com o serviço Nginx ativo, o acesso ao Endereço IPv4 Público da instância EC2 através de um navegador exibiu a página personalizada com sucesso.
+### Etapa 3: Script de Monitoramento e Automação
 
+Com o servidor web funcional, o foco passou a ser a criação de um sistema de monitoramento
 
+#### 1. Desenvolvimento do Script
 
+Foi desenvolvido um script em Bash, chamado `monitor.sh`, com uma lógica simples e eficaz:
+* Verificar o status HTTP do site a cada execução.
+* Registar o resultado (sucesso ou falha) com data e hora num ficheiro de log.
+* Em caso de falha, enviar um alerta para um canal de comunicação.
+para escrever digite: `nano monitor.sh`
+* **Código Final (`monitor.sh`):**
+    ```bash
+    #!/bin/bash
 
+    # Configs básicas
+    site="[http://127.0.0.1](http://127.0.0.1)"
+    log="/var/log/monitoramento.log"
+    # A URL real do webhook foi removida por segurança
+    webhook="SUA_URL_SECRETA_DO_DISCORD_AQUI"
 
+    # Data e hora atual
+    data=$(date "+%Y-%m-%d %H:%M:%S")
+
+    # Testa o site e pega o status HTTP
+    status=$(curl -s -o /dev/null -w "%{http_code}" "$site")
+
+    if [ "$status" -eq 200 ]; then
+        echo "[$data] Site funcionando (HTTP $status)" >> "$log"
+    else
+        echo "[$data] ERRO: Site fora do ar! Código HTTP $status" >> "$log"
+        msg="🚨 **ALERTA:** O site está offline! Código: $status"
+        curl -s -X POST -H "Content-Type: application/json" -d "{\"content\": \"$msg\"}" "$webhook"
+    fi
+    ```
+
+#### 2. Configuração do Sistema de Alertas (Discord Webhook)
+
+Dentre as opções de canais de notificação, **foi escolhido o Discord** pela sua simplicidade na configuração de integrações. Para que o script pudesse enviar mensagens para um canal, foi utilizado um recurso chamado **Webhook**.
+
+Um webhook é uma URL que funciona como um "endereço de entrega" para mensagens. O processo de configuração foi o seguinte:
+
+1.  **Criação do Canal:** Um novo canal de texto (ex: `#alertas-servidor`) foi criado no servidor do Discord.
+2.  **Acesso às Integrações:** Nas configurações do canal, foi selecionada a opção "Integrações".
+3.  **Criação do Webhook:** Foi utilizada a opção "Criar Webhook". O Discord gerou um bot e uma URL única.
+4.  **Obtenção da URL:** A "URL do Webhook" foi copiada. É esta URL que foi inserida na variável `webhook` do script para direcionar os alertas.
+
+#### 3. Automação com Cron
+
+Para cumprir o requisito do projeto de executar o monitoramento **a cada 1 minuto**, foi utilizada a ferramenta padrão do Linux, o `cron`. A configuração foi feita da seguinte forma:
+
+1.  **Edição do Crontab:** O comando `crontab -e` foi executado no terminal para abrir o ficheiro de agendamento de tarefas do utilizador.
+2.  **Adição da Tarefa:** A seguinte linha foi adicionada ao ficheiro para definir a automação:
+    ```
+    * * * * * /bin/bash /home/ubuntu/monitor.sh > /dev/null 2>&1
+    ```
+    * `* * * * *`: Define a execução para "a cada minuto".
+    * `/bin/bash ...`: Especifica o comando a ser executado.
+    * `> /dev/null 2>&1`: Redireciona toda a saída do script para o "vazio", uma boa prática para evitar notificações desnecessárias do sistema `cron`.
+3.  **Ativação:** Ao salvar o ficheiro, a tarefa foi ativada instantaneamente pelo sistema, garantindo o monitoramento contínuo.
+
+*Exemplo do Alerta e dos Logs Gerados:*
+`[Coloque aqui os prints do alerta no Discord e do ficheiro de log]`
