@@ -33,21 +33,19 @@ O processo de criação da infraestrutura no console da AWS seguiu os seguintes 
     * **Endpoints da VPC:** `Gateway do S3`
 * Após a confirmação, o assistente criou a VPC, as 4 sub-redes, um **Internet Gateway** e as tabelas de rotas necessárias.
 
-* 
-
 **2. Criação do Servidor (Instância EC2):**
 
 * No console da AWS, foi acedido o serviço **EC2**.
 * Foi selecionada a opção **"Executar instância"**.
 * As configurações aplicadas foram:
     * **AMI (Sistema Operacional):** `Ubuntu Server LTS`
-    * **Tags**
+    * **Tags**(escolha do usuario)
     * **Tipo de Instância:** `t2.micro` 
     * **Par de Chaves (Login):** Foi criado um novo par de chaves do tipo `RSA` e formato `.pem`, que foi descarregado e guardado em segurança para permitir o acesso SSH.
     * **Configurações de Rede:** A instância foi associada à **VPC** `projeto-final-vpc` e colocada numa das **sub-redes públicas**. A opção para atribuir um IP público automaticamente foi ativada.
     * **Firewall (Grupo de Segurança):** Foi criado um novo Security Group com as seguintes regras de entrada:
-        * Permitir tráfego **SSH** (porta 22) para acesso administrativo.
-        * Permitir tráfego **HTTP** (porta 80) para acesso ao servidor web.
+        * Permitir tráfego **SSH** (porta 22) para qualquer lugar (0.0.0.0/0)
+        * Permitir tráfego **HTTP** (porta 80) para qualquer lugar (0.0.0.0/0)
 
 * Finalmente, a instância foi executada clicando em **"Executar instância"**.
 
