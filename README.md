@@ -2,7 +2,7 @@
 Projeto de configuração de servidor web com monitoramento e alertas automatizados
 
 ## Objetivo do Projeto
-[cite_start]O objetivo deste projeto foi desenvolver e testar habilidades em Linux, AWS e automação através da configuração de um ambiente de servidor web Nginx monitorado, que envia alertas em caso de falha. [cite: 13, 1]
+O objetivo deste projeto foi desenvolver e testar habilidades em Linux, AWS e automação através da configuração de um ambiente de servidor web Nginx monitorado, que envia alertas em caso de falha.
 
 ## Ferramentas e Tecnologias Utilizadas
 * **Cloud:** AWS (EC2, VPC, Security Groups)
@@ -34,6 +34,8 @@ O processo de criação da infraestrutura no console da AWS seguiu os seguintes 
     * **Gateways NAT:** `Nenhum`
     * **Endpoints da VPC:** `Gateway do S3`
 * Após a confirmação, o assistente criou a VPC, as 4 sub-redes, um **Internet Gateway** e as tabelas de rotas necessárias.
+![Configuração da VPC e Mapa de Recursos](vpc-configurada.png)
+* 
 
 **2. Criação do Servidor (Instância EC2):**
 
@@ -60,7 +62,7 @@ O acesso foi realizado a partir de um terminal local (Windows PowerShell), segui
 **1. Pré-requisitos:**
 * A instância EC2 estava no estado "Em execução" (Running).
 * O **Endereço IPv4 Público** da instância foi copiado do painel da AWS.
-* O ficheiro da chave privada (**`.pem`**), descarregado durante a criação do Par de Chaves, estava guardado num local seguro no computador local.
+* O ficheiro da chave privada (**`.pem`**), criado e baixado durante a criação do Par de Chaves, estava guardado num local seguro no computador local.
 
 **2. Navegação para a Pasta da Chave:**
 No terminal local, foi utilizado o comando `cd` para navegar até à pasta onde o ficheiro `.pem` estava guardado.
@@ -89,12 +91,7 @@ Os componentes deste comando são:
 Na primeira vez que se conecta a um novo servidor, o cliente SSH exibe a "impressão digital" (fingerprint) do servidor e pede uma confirmação de confiança. Foi digitado `yes` para aprovar a conexão e adicionar o servidor à lista de hosts conhecidos. Esta é uma medida de segurança importante contra ataques "man-in-the-middle".
 
 *Exemplo da confirmação de autenticidade:*
-`[Coloque aqui o print do PowerShell a pedir a confirmação "yes/no"]`
-
-Após estes passos, a conexão segura foi estabelecida com sucesso, permitindo a gestão completa do servidor remoto através da linha de comando, como se pode ver no resultado final.
-
-*Exemplo da conexão bem-sucedida:*
-`[Coloque aqui o print do seu terminal já conectado à instância AWS]`
+![Coloque aqui o print do PowerShell a pedir a confirmação "yes/no"](conexao-ssh.png)
 
 ```
 ```
@@ -147,8 +144,6 @@ sudo apt install nginx -y
     </html>
     ```
 
-**3. Verificação Final:**
-
 ### Etapa 3: Script de Monitoramento e Automação
 
 Com o servidor web funcional, o foco passou a ser a criação de um sistema de monitoramento
@@ -165,7 +160,7 @@ para escrever digite: `nano monitor.sh`
     #!/bin/bash
 
     # Configs básicas
-    site="[http://127.0.0.1](http://127.0.0.1)"
+    site="(http://127.0.0.1)"
     log="/var/log/monitoramento.log"
     # A URL real do webhook foi removida por segurança
     webhook="SUA_URL_SECRETA_DO_DISCORD_AQUI"
@@ -187,7 +182,6 @@ para escrever digite: `nano monitor.sh`
 
 #### 2. Configuração do Sistema de Alertas (Discord Webhook)
 
-Dentre as opções de canais de notificação, **foi escolhido o Discord** pela sua simplicidade na configuração de integrações. Para que o script pudesse enviar mensagens para um canal, foi utilizado um recurso chamado **Webhook**.
 
 Um webhook é uma URL que funciona como um "endereço de entrega" para mensagens. O processo de configuração foi o seguinte:
 
@@ -210,5 +204,61 @@ Para cumprir o requisito do projeto de executar o monitoramento **a cada 1 minut
     * `> /dev/null 2>&1`: Redireciona toda a saída do script para o "vazio", uma boa prática para evitar notificações desnecessárias do sistema `cron`.
 3.  **Ativação:** Ao salvar o ficheiro, a tarefa foi ativada instantaneamente pelo sistema, garantindo o monitoramento contínuo.
 
+
+#### 4. Configuração e Verificação dos Logs
+
+Um passo crucial para o funcionamento do script foi a correta configuração do ficheiro de log, que deve ser armazenado em um local no servidor.
+
+* **Localização do Log:** Conforme definido no script, os registos são guardados em `/var/log/monitoramento.log`.
+
+* **Configuração de Permissões:** O diretório `/var/log` é uma área protegida do sistema. Para que o script, executado pelo `cron`, pudesse escrever neste local, foram necessários os seguintes comandos para criar o ficheiro e atribuir a permissão correta ao utilizador `ubuntu`:
+    ```bash
+    # Cria o ficheiro de log vazio
+    sudo touch /var/log/monitoramento.log
+    
+    # Define o utilizador 'ubuntu' como o dono do ficheiro
+    sudo chown ubuntu:ubuntu /var/log/monitoramento.log
+    ```
+
+* **Visualização dos Logs:** Para verificar os registos em tempo real, o comando `tail -f` foi utilizado, enquanto o comando `cat` serviu para exibir o conteúdo completo do ficheiro.
+    ```bash
+    # Observa o log em tempo real
+    tail -f /var/log/monitoramento.log
+    ```
+
 *Exemplo do Alerta e dos Logs Gerados:*
 `[Coloque aqui os prints do alerta no Discord e do ficheiro de log]`
+
+### Etapa 4: Testes de Validação e Conclusão
+
+Para validar que a solução completa era robusta e funcional, foi executada uma série de testes no ambiente da AWS, simulando cenários de operação normal e de falha, conforme solicitado pelo projeto.
+
+#### Teste 1: Simulação de Falha do Serviço
+
+* **Ação Realizada:** O serviço Nginx foi parado manualmente no servidor com o comando `sudo systemctl stop nginx` para simular uma falha inesperada do servidor web.
+* **Resultado Verificado:**
+    1.  **Alerta Imediato:** Na execução seguinte do script de monitoramento, uma notificação de alerta foi recebida com sucesso no canal configurado no Discord.
+    2.  **Registo de Log:** O ficheiro `/var/log/monitoramento.log` foi atualizado com uma nova linha, registando a "FALHA" e o código de status correspondente.
+
+*Exemplo do Alerta Recebido no Discord:*
+`[Coloque aqui o print do alerta a chegar no seu Discord]`
+
+#### Teste 2: Simulação de Recuperação do Serviço
+
+* **Ação Realizada:** O serviço Nginx foi iniciado novamente com o comando `sudo systemctl start nginx`, simulando a recuperação do serviço.
+* **Resultado Verificado:**
+    1.  **Fim dos Alertas:** Nenhuma nova notificação de falha foi enviada.
+    2.  **Registo de Log:** Na execução seguinte do script, o ficheiro de log foi atualizado com uma nova linha, desta vez registando "Site funcionando", confirmando que o sistema de monitoramento detetou a normalização do serviço.
+
+*Exemplo do Ficheiro de Log com funcionamento e Falha(Oflline):*
+`[Coloque aqui o print do seu ficheiro de log]`
+
+---
+
+## 🎓 Conclusão e Aprendizados
+
+Este projeto foi uma jornada prática e completa através dos pilares do DevSecOps. A construção de uma infraestrutura na nuvem com a AWS, a configuração de um servidor web Linux e, principalmente, a criação de um sistema de monitoramento com alertas e automação, permitiram solidificar conceitos fundamentais da área.
+
+Os principais desafios superados, como a resolução de problemas de rede (`Connection timed out` vs. `Connection refused`), a gestão de permissões de ficheiros no Linux e a escolha da ferramenta de automação correta, foram os pontos de maior aprendizado.
+
+O resultado final é um sistema funcional, monitorado e resiliente, que cumpre todos os requisitos propostos e utiliza práticas profissionais da indústria.
