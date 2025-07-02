@@ -32,7 +32,7 @@ O processo de criação da infraestrutura no console da AWS seguiu os seguintes 
     * **Gateways NAT:** `Nenhum`
     * **Endpoints da VPC:** `Gateway do S3`
 * Após a confirmação, o assistente criou a VPC, as 4 sub-redes, um **Internet Gateway** e as tabelas de rotas necessárias.
-![Configuração da VPC e Mapa de Recursos](vpc-configurada.png)
+
 * 
 
 **2. Criação do Servidor (Instância EC2):**
